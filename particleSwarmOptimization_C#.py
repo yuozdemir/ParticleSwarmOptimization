@@ -153,7 +153,6 @@ class PSO:
             i.BestValues = i.Values
 
         for i in self.swarm:
-            # i.Velocity = [[0 for _ in range(self.n)] for _ in range(3)]
             i.Velocity = [[random.random() * (self.max_velocity[i] - self.min_velocity[i]) + self.min_velocity[i] for _ in range(self.n)] for i in range(3)]
 
         self.best_fitness = 0.0
