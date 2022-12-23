@@ -185,7 +185,7 @@ class PSO:
 n_iter = 20
 n_swarm = 20
 
-N = 20
+N = 12
 b_bounds = [90.0, 90.0]
 d_bounds = [0.5, 0.5]
 w_bounds = [0.0, 1.0]
