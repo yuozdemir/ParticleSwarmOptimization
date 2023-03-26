@@ -4,7 +4,7 @@ import matplotlib.pyplot as plt
 
 
 class PSO:
-    def __init__(self, n_iter_, n_swarm_, n_, b_, d_, w_, c1_, c2_):
+    def __init__(self, n_iter_, n_swarm_, n_, b_, d_, w_, c1_, c2_, t_):
         self.iterations_timer = 0
         self.phi = np.linspace(0, 2 * np.pi, 1000)
         self.phi_180 = [self.phi[i] * (180 / np.pi) for i in range(len(self.phi))]
@@ -19,6 +19,8 @@ class PSO:
 
         self.c1 = c1_
         self.c2 = c2_
+
+        self.topology = t_
 
         self.swarm = []
         self.b = []
@@ -50,9 +52,17 @@ class PSO:
 
     def array_factor(self, b_, d_, w_, m_=-60):
         s = 0
-        for i in range(self.n):
-            psi = (2 * np.pi) * (d_[i]) * (np.cos(self.phi) + b_[i])
-            s = s + w_[i] * np.exp(1j * psi * i)
+
+        if self.topology == "Lineer":
+            for i in range(self.n):
+                psi = (2 * np.pi) * (d_[i]) * (np.cos(self.phi) + b_[i])
+                s = s + w_[i] * np.exp(1j * psi * i)
+
+        if self.topology == "Dairesel":
+            for i in range(self.n):
+                psi = (2 * np.pi) * (d_[i]) * ((np.cos(self.phi) * np.sin(np.pi / 2)) + b_[i])
+                s = s + w_[i] * np.exp(1j * psi * i)
+
         g = np.abs(s) ** 2
         dbi = 10 * np.log10(g / np.max(g))
         return np.clip(dbi, m_, None)
@@ -167,6 +177,7 @@ class PSO:
             self.update_particles()
             self.iterations_timer += 1
             if self.Fitness_Value > self.best_fitness:
+                print(f"> {self.iterations_timer}")
                 self.best_fitness = self.Fitness_Value
                 self.best_found = self.Found_Value
 
@@ -195,9 +206,10 @@ N = 12
 b_bounds = [90.0, 90.0]
 d_bounds = [0.5, 0.5]
 w_bounds = [0.0, 1.0]
+topology = "Lineer"
 
 c1 = 2
 c2 = 2
 
-Go = PSO(n_iter, n_swarm, N, b_bounds, d_bounds, w_bounds, c1, c2)
+Go = PSO(n_iter, n_swarm, N, b_bounds, d_bounds, w_bounds, c1, c2, topology)
 Go.main()
