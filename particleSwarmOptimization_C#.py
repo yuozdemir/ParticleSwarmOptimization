@@ -5,7 +5,7 @@ import sys
 
 
 class PSO:
-    def __init__(self, n_iter_, n_swarm_, n_, b_, d_, w_, c1_, c2_, database_):
+    def __init__(self, n_iter_, n_swarm_, n_, b_, d_, w_, c1_, c2_, t_, database_):
         self.iterations_timer = 0
         self.phi = np.linspace(0, 2 * np.pi, 1000)
         self.phi_180 = [self.phi[i] * (180 / np.pi) for i in range(len(self.phi))]
@@ -20,6 +20,8 @@ class PSO:
 
         self.c1 = c1_
         self.c2 = c2_
+
+        self.topology = t_
 
         self.swarm = []
         self.b = []
@@ -53,9 +55,17 @@ class PSO:
 
     def array_factor(self, b_, d_, w_, m_=-60):
         s = 0
-        for i in range(self.n):
-            psi = (2 * np.pi) * (d_[i]) * (np.cos(self.phi) + b_[i])
-            s = s + w_[i] * np.exp(1j * psi * i)
+
+        if self.topology == "Lineer":
+            for i in range(self.n):
+                psi = (2 * np.pi) * (d_[i]) * (np.cos(self.phi) + b_[i])
+                s = s + w_[i] * np.exp(1j * psi * i)
+
+        if self.topology == "Dairesel":
+            for i in range(self.n):
+                psi = (2 * np.pi) * (d_[i]) * ((np.cos(self.phi) * np.sin(np.pi / 2)) + b_[i])
+                s = s + w_[i] * np.exp(1j * psi * i)
+
         g = np.abs(s) ** 2
         dbi = 10 * np.log10(g / np.max(g))
         return np.clip(dbi, m_, None)
@@ -177,26 +187,28 @@ class PSO:
         page = workbook.add_worksheet()
 
         page.write(0, 1, 'Parameters')
-        page.write(1, 0, 'n_iter')
-        page.write(2, 0, 'n_swarm')
-        page.write(3, 0, 'N')
-        page.write(4, 0, 'b_bounds')
-        page.write(5, 0, 'd_bounds')
-        page.write(6, 0, 'w_bounds')
-        page.write(7, 0, 'c1')
-        page.write(8, 0, 'c2')
+        page.write(1, 0, 'topology')
+        page.write(2, 0, 'n_iter')
+        page.write(3, 0, 'n_swarm')
+        page.write(4, 0, 'N')
+        page.write(5, 0, 'b_bounds')
+        page.write(6, 0, 'd_bounds')
+        page.write(7, 0, 'w_bounds')
+        page.write(8, 0, 'c1')
+        page.write(9, 0, 'c2')
 
-        page.write(1, 1, self.n_iter)
-        page.write(2, 1, self.n_swarm)
-        page.write(3, 1, self.n)
-        page.write(4, 1, self.b_bounds[0])
-        page.write(4, 2, self.b_bounds[1])
-        page.write(5, 1, self.d_bounds[0])
-        page.write(5, 2, self.d_bounds[1])
-        page.write(6, 1, self.w_bounds[0])
-        page.write(6, 2, self.w_bounds[1])
-        page.write(7, 1, self.c1)
-        page.write(8, 1, self.c2)
+        page.write(1, 1, self.topology)
+        page.write(2, 1, self.n_iter)
+        page.write(3, 1, self.n_swarm)
+        page.write(4, 1, self.n)
+        page.write(5, 1, self.b_bounds[0])
+        page.write(5, 2, self.b_bounds[1])
+        page.write(6, 1, self.d_bounds[0])
+        page.write(6, 2, self.d_bounds[1])
+        page.write(7, 1, self.w_bounds[0])
+        page.write(7, 2, self.w_bounds[1])
+        page.write(8, 1, self.c1)
+        page.write(9, 1, self.c2)
 
         page.write(0, 3, 'B Bounds')
         page.write(0, 4, 'D Bounds')
@@ -239,7 +251,9 @@ w_bounds = [float(sys.argv[8]), float(sys.argv[9])]
 c1 = float(sys.argv[10])
 c2 = float(sys.argv[11])
 
-dataBase = sys.argv[12]
+topology = sys.argv[12]
 
-Go = PSO(n_iter, n_swarm, N, b_bounds, d_bounds, w_bounds, c1, c2, dataBase)
+dataBase = sys.argv[13]
+
+Go = PSO(n_iter, n_swarm, N, b_bounds, d_bounds, w_bounds, c1, c2, topology, dataBase)
 Go.main()
